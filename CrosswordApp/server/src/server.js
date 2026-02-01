@@ -5,8 +5,13 @@ const { env } = require("./config/env");
 const { connectDb } = require("./config/db");
 
 async function start() {
-  env.require("JWT_SECRET");
-  env.require("MONGO_URI");
+  // Ensure critical config is present using the computed env properties
+  if (!env.jwtSecret) {
+    throw new Error("Missing environment variable: JWT_SECRET");
+  }
+  if (!env.mongoUri) {
+    throw new Error("Missing environment variable: MONGO_URI or MONGODB_URI");
+  }
 
   console.log("Connecting to MongoDB...");
   await connectDb(env.mongoUri);
