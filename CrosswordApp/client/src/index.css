@@ -1,0 +1,237 @@
+@import url("https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap");
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+.lenis.lenis-scrolling iframe {
+  pointer-events: none;
+}
+
+:root {
+  --bg: #f4f2ed;
+  --fg: #111111;
+  --muted: #6f6f6f;
+  --line: rgba(17, 17, 17, 0.08);
+  --panel: rgba(255, 255, 255, 0.7);
+  --panel-strong: rgba(255, 255, 255, 0.85);
+  --glass-shadow: 0 30px 80px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.7);
+}
+
+body {
+  font-family: "Manrope", system-ui, sans-serif;
+  color: var(--fg);
+  background: #f7f5f1; /* Simplified background to let balls pop */
+}
+
+.surface {
+  background: rgba(255, 255, 255, 0.4); /* More transparent */
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  box-shadow: 
+    0 4px 6px -1px rgba(0, 0, 0, 0.05),
+    0 10px 15px -3px rgba(0, 0, 0, 0.05),
+    inset 0 0 20px rgba(255, 255, 255, 0.5); /* Inner glow for 3D feel */
+  border-radius: 1.5rem;
+}
+
+.glass-panel {
+  background: rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
+  border-radius: 1rem;
+}
+
+.card-3d {
+  transform-style: preserve-3d;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  will-change: transform, box-shadow;
+}
+
+.card-3d:hover {
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 
+    0 20px 25px -5px rgba(0, 0, 0, 0.1), 
+    0 10px 10px -5px rgba(0, 0, 0, 0.04),
+    0 0 0 1px rgba(255, 255, 255, 0.5);
+}
+
+.text-glow {
+  text-shadow: 0 0 18px rgba(0, 0, 0, 0.12);
+}
+
+.shine {
+  position: relative;
+  overflow: hidden;
+}
+
+.shine::after {
+  content: "";
+  position: absolute;
+  inset: -60%;
+  background: linear-gradient(120deg, transparent 35%, rgba(255, 255, 255, 0.22), transparent 65%);
+  transform: translateX(-40%) rotate(12deg);
+  opacity: 0;
+  transition: opacity 300ms ease;
+  pointer-events: none;
+}
+
+.shine:hover::after {
+  opacity: 1;
+  animation: shine-sweep 1.2s ease forwards;
+}
+
+@keyframes shine-sweep {
+  0% {
+    transform: translateX(-45%) rotate(12deg);
+  }
+  100% {
+    transform: translateX(100%) rotate(12deg);
+  }
+}
+
+/* Custom Scrollbar */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.1);
+  border-radius: 20px;
+}
+.custom-scrollbar:hover::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.2);
+}
+
+.dark .custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+.dark .custom-scrollbar:hover::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Dark Mode Overrides */
+.dark body {
+  background: linear-gradient(180deg, #111111 0%, #0a0a0a 100%);
+  color: #f4f2ed;
+}
+
+.dark .surface {
+  background: rgba(30, 30, 30, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+/* Cyberpunk Theme */
+[data-theme="cyberpunk"] body {
+  background: #050505;
+  background-image: 
+    linear-gradient(rgba(0, 255, 255, 0.1) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 0, 255, 0.1) 1px, transparent 1px);
+  background-size: 30px 30px;
+  color: #00ffea;
+  font-family: "Space Grotesk", sans-serif;
+}
+[data-theme="cyberpunk"] .surface {
+  background: rgba(10, 10, 20, 0.9);
+  border: 1px solid #ff00ff;
+  box-shadow: 0 0 15px rgba(255, 0, 255, 0.3), inset 0 0 20px rgba(0, 255, 255, 0.1);
+}
+[data-theme="cyberpunk"] .active-cell {
+  background: #fcee0a !important;
+  color: #000 !important;
+  box-shadow: 0 0 10px #fcee0a;
+}
+[data-theme="cyberpunk"] .highlight-cell {
+  background: rgba(252, 238, 10, 0.3) !important;
+}
+
+/* Retro 80s Theme */
+[data-theme="retro"] body {
+  background: linear-gradient(135deg, #2d1b4e 0%, #1a1a2e 100%);
+  color: #f093fb;
+}
+[data-theme="retro"] .surface {
+  background: rgba(45, 27, 78, 0.85);
+  border: 2px solid #4cc9f0;
+  box-shadow: 6px 6px 0px #4cc9f0;
+  border-radius: 0;
+}
+[data-theme="retro"] .active-cell {
+  background: #f72585 !important;
+  color: #fff !important;
+}
+
+/* Pastel Theme */
+[data-theme="pastel"] body {
+  background: #fdf6e3;
+  color: #586e75;
+}
+[data-theme="pastel"] .surface {
+  background: #fff;
+  border: 2px solid #b58900;
+  border-radius: 20px;
+  box-shadow: 5px 5px 0px #cb4b16;
+}
+[data-theme="pastel"] .active-cell {
+  background: #859900 !important;
+  color: #fff !important;
+}
+
+.markdown h1 {
+  @apply text-4xl font-semibold mt-8 mb-4;
+}
+.markdown h2 {
+  @apply text-3xl font-semibold mt-8 mb-4;
+}
+.markdown h3 {
+  @apply text-2xl font-semibold mt-6 mb-3;
+}
+.markdown p {
+  @apply my-4 leading-8 text-[17px];
+}
+.markdown ul {
+  @apply list-disc pl-6 my-3;
+}
+.markdown ol {
+  @apply list-decimal pl-6 my-3;
+}
+.markdown a {
+  @apply text-blue-600 underline;
+}
+.markdown pre {
+  @apply bg-slate-900 text-slate-50 p-3 rounded-lg overflow-x-auto my-4;
+}
+.markdown code {
+  @apply bg-slate-200 px-1 py-0.5 rounded;
+}
+.markdown pre code {
+  @apply bg-transparent p-0;
+}
