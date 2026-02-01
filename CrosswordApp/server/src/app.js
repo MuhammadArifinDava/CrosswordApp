@@ -7,6 +7,8 @@ const { usersRoutes } = require("./routes/usersRoutes");
 const { crosswordRoutes } = require("./routes/crosswordRoutes");
 const { scoreRoutes } = require("./routes/scoreRoutes");
 
+const fs = require("fs");
+
 const app = express();
 
 app.use((req, res, next) => {
@@ -22,24 +24,21 @@ const allowedOrigins = String(env.clientOrigin || "")
   .map((s) => s.trim())
   .filter(Boolean);
 
+// CORS Configuration
 app.use(
   cors({
     origin: (origin, callback) => {
       // Allow requests with no origin (like mobile apps or curl requests)
       if (!origin) return callback(null, true);
       
-      // If allowedOrigins is empty/default, allow all (or specific logic)
-      if (allowedOrigins.length === 0) return callback(null, true);
-
-      if (allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        // Optional: fail closed in production
-        // callback(new Error('Not allowed by CORS'));
-        // For now, keep permissive for easier dev/testing if origin matches
-        console.warn(`CORS Warning: Origin ${origin} not in allowed list`, allowedOrigins);
-        callback(null, true); // Still allow for now, but log warning. Change to false to block.
+      // Check if allowedOrigins contains "*" or the specific origin
+      if (allowedOrigins.includes("*") || allowedOrigins.includes(origin)) {
+        return callback(null, true);
       }
+
+      // Default to allowing for now to debug, but log warning
+      console.warn(`CORS Warning: Origin ${origin} not in allowed list`, allowedOrigins);
+      callback(null, true);
     },
     credentials: true,
   })
@@ -60,12 +59,23 @@ app.use("/scores", scoreRoutes);
 // Serve static files from client build (Production Mode)
 if (process.env.NODE_ENV === 'production') {
     const clientBuildPath = path.join(__dirname, "../../client/dist");
-    app.use(express.static(clientBuildPath));
+    
+    // Only serve static files if the directory exists
+    if (fs.existsSync(clientBuildPath)) {
+        app.use(express.static(clientBuildPath));
 
-    // Handle client-side routing by serving index.html for all non-API routes
-    app.get("*", (req, res) => {
-        res.sendFile(path.join(clientBuildPath, "index.html"));
-    });
+        // Handle client-side routing by serving index.html for all non-API routes
+        app.get("*", (req, res) => {
+            res.sendFile(path.join(clientBuildPath, "index.html"));
+        });
+    } else {
+        console.log("Client build not found, running in API-only mode.");
+        
+        // Add a default root route for API-only mode
+        app.get("/", (req, res) => {
+            res.json({ message: "Crossword API is running", version: "1.0.0" });
+        });
+    }
 }
 
 app.use((err, req, res, _next) => {
