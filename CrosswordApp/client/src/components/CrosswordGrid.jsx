@@ -76,7 +76,10 @@ export function CrosswordGrid({ grid, rows, cols, onCellClick, activeCell, userA
                 ${hoverClass}
                 ${cell.num ? 'items-end pb-0.5' : ''}
               `}
-              onClick={() => onCellClick && onCellClick(rIndex, cIndex)}
+              onClick={(e) => {
+                e.stopPropagation();
+                onCellClick && onCellClick(rIndex, cIndex);
+              }}
             >
               {cell.num && (
                 <span className={`absolute top-0.5 left-0.5 text-[0.6rem] leading-none font-bold ${isSelected ? 'text-black/60' : 'text-gray-400 dark:text-gray-500'}`}>

@@ -1,6 +1,12 @@
 import React, { useRef, useState } from 'react';
 import { FaShareAlt, FaDownload, FaTimes, FaInstagram, FaWhatsapp } from 'react-icons/fa';
 
+const formatTime = (seconds) => {
+  const m = Math.floor(seconds / 60);
+  const s = seconds % 60;
+  return `${m}:${s.toString().padStart(2, '0')}`;
+};
+
 const ShareModal = ({ isOpen, onClose, stats, theme }) => {
   const cardRef = useRef(null);
   const [imageUrl, setImageUrl] = useState(null);
