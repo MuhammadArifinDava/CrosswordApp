@@ -1,167 +1,174 @@
+require('dotenv').config({ path: '../.env' });
 const mongoose = require('mongoose');
-const { User } = require('../models/User');
-const Crossword = require('../models/Crossword');
-const CrosswordGenerator = require('../utils/crosswordGenerator');
+const Crossword = require('../models/Crossword'); // Direct export
+const { User } = require('../models/User'); // Named export
 
-// Production DB URI
-const MONGO_URI = "mongodb+srv://chipsey:mongodb132@cluster0.whnnt3b.mongodb.net/crossword_production?retryWrites=true&w=majority&appName=Cluster0";
+// If running from root of server, adjust path to .env
+// We assume this script is run as: node src/scripts/seedCrosswords.js from server/ directory
 
-const DATASETS = [
+const mongoUri = process.env.MONGO_URI || process.env.MONGODB_URI;
+
+if (!mongoUri) {
+  console.error("❌ MONGO_URI is missing in environment variables.");
+  console.log("Usage: MONGO_URI='...' node src/scripts/seedCrosswords.js");
+  process.exit(1);
+}
+
+const sampleCrosswords = [
   {
-    title: "Dunia Programming",
-    description: "Teka-teki silang seputar istilah koding dan teknologi.",
-    difficulty: "Medium",
-    words: [
-      { word: "JAVASCRIPT", clue: "Bahasa pemrograman web paling populer" },
-      { word: "PYTHON", clue: "Bahasa pemrograman yang identik dengan ular" },
-      { word: "DATABASE", clue: "Tempat penyimpanan data aplikasi" },
-      { word: "API", clue: "Antarmuka penghubung antar aplikasi (singkatan)" },
-      { word: "REACT", clue: "Library frontend buatan Facebook" },
-      { word: "SERVER", clue: "Komputer yang melayani permintaan client" },
-      { word: "DEBUG", clue: "Proses mencari dan memperbaiki bug" },
-      { word: "GIT", clue: "Sistem kontrol versi ciptaan Linus Torvalds" },
-      { word: "LINUX", clue: "Sistem operasi open source berlambang pinguin" },
-      { word: "HTML", clue: "Bahasa markah untuk membuat struktur web" }
-    ]
-  },
-  {
-    title: "Pengetahuan Umum Indonesia",
-    description: "Seberapa tahu kamu tentang Indonesia?",
+    title: "Web Dev Basics",
+    rows: 10,
+    cols: 10,
     difficulty: "Easy",
-    words: [
-      { word: "JAKARTA", clue: "Ibukota negara Indonesia (saat ini)" },
-      { word: "RENDANG", clue: "Makanan terenak di dunia asal Padang" },
-      { word: "KOMODO", clue: "Kadal raksasa dari Nusa Tenggara Timur" },
-      { word: "RUPIAH", clue: "Mata uang resmi Indonesia" },
-      { word: "BATIK", clue: "Kain bermotif warisan budaya UNESCO" },
-      { word: "MERDEKA", clue: "Kata yang diteriakkan saat 17 Agustus" },
-      { word: "BALI", clue: "Pulau Dewata yang terkenal di dunia" },
-      { word: "JOKOWI", clue: "Nama panggilan Presiden ke-7 RI" },
-      { word: "GADO", clue: "Salad-nya orang Indonesia (awal kata)" },
-      { word: "MELATI", clue: "Bunga puspa bangsa" }
-    ]
+    isPublished: true,
+    grid: [], // Will be filled
+    clues: {
+      across: [
+        { number: 1, clue: "Standard markup language for documents designed to be displayed in a web browser", answer: "HTML", row: 0, col: 0 },
+        { number: 3, clue: "Cascading Style Sheets", answer: "CSS", row: 2, col: 0 },
+        { number: 5, clue: "JavaScript runtime built on Chrome's V8 JavaScript engine", answer: "NODE", row: 4, col: 0 },
+        { number: 7, clue: "A library for building user interfaces", answer: "REACT", row: 6, col: 0 }
+      ],
+      down: [
+        { number: 1, clue: "Hypertext Transfer Protocol", answer: "HTTP", row: 0, col: 0 },
+        { number: 2, clue: "Local Area Network", answer: "LAN", row: 0, col: 2 },
+        { number: 4, clue: "Structured Query Language", answer: "SQL", row: 2, col: 2 },
+        { number: 6, clue: "Document Object Model", answer: "DOM", row: 4, col: 3 }
+      ]
+    }
   },
   {
-    title: "Pop Culture & Movies",
-    description: "Tebak judul film dan karakter terkenal!",
-    difficulty: "Medium",
-    words: [
-      { word: "AVENGERS", clue: "Tim superhero Marvel" },
-      { word: "BARBIE", clue: "Boneka yang jadi film hits 2023" },
-      { word: "NETFLIX", clue: "Layanan streaming film populer" },
-      { word: "OPPENHEIMER", clue: "Film tentang pembuat bom atom" },
-      { word: "TAYLOR", clue: "Nama depan penyanyi 'Eras Tour'" },
-      { word: "KPOP", clue: "Genre musik populer dari Korea Selatan" },
-      { word: "TIKTOK", clue: "Aplikasi video pendek yang viral" },
-      { word: "BATMAN", clue: "Superhero manusia kelelawar" },
-      { word: "ANIME", clue: "Kartun khas Jepang" },
-      { word: "OSCAR", clue: "Piala penghargaan film bergengsi" }
-    ]
-  },
-  {
-    title: "English Vocabulary",
-    description: "Learn basic English words through playing.",
+    title: "Animal Kingdom",
+    rows: 10,
+    cols: 10,
     difficulty: "Easy",
-    words: [
-      { word: "ELEPHANT", clue: "A large animal with a trunk" },
-      { word: "SUMMER", clue: "The hottest season of the year" },
-      { word: "YELLOW", clue: "The color of the sun and bananas" },
-      { word: "SCHOOL", clue: "Place where students learn" },
-      { word: "LIBRARY", clue: "Place to borrow books" },
-      { word: "DOCTOR", clue: "Person who treats sick people" },
-      { word: "PIZZA", clue: "Italian dish with cheese and tomato" },
-      { word: "GUITAR", clue: "Musical instrument with strings" },
-      { word: "SOCCER", clue: "Most popular sport in the world" },
-      { word: "WATER", clue: "Liquid necessary for life" }
-    ]
+    isPublished: true,
+    clues: {
+      across: [
+        { number: 1, clue: "King of the jungle", answer: "LION", row: 0, col: 0 },
+        { number: 3, clue: "Striped big cat", answer: "TIGER", row: 2, col: 0 },
+        { number: 5, clue: "Largest land animal", answer: "ELEPHANT", row: 4, col: 0 }
+      ],
+      down: [
+        { number: 1, clue: "Long-necked safari animal", answer: "GIRAFFE", row: 0, col: 0 },
+        { number: 2, clue: "Man's best friend", answer: "DOG", row: 0, col: 3 }
+      ]
+    }
+  },
+  {
+    title: "World Capitals",
+    rows: 12,
+    cols: 12,
+    difficulty: "Medium",
+    isPublished: true,
+    clues: {
+      across: [
+        { number: 1, clue: "Capital of France", answer: "PARIS", row: 0, col: 0 },
+        { number: 4, clue: "Capital of Japan", answer: "TOKYO", row: 2, col: 0 },
+        { number: 6, clue: "Capital of Italy", answer: "ROME", row: 4, col: 0 }
+      ],
+      down: [
+        { number: 2, clue: "Capital of Spain", answer: "MADRID", row: 0, col: 2 },
+        { number: 3, clue: "Capital of Germany", answer: "BERLIN", row: 0, col: 4 }
+      ]
+    }
+  },
+  {
+    title: "Programming Languages",
+    rows: 15,
+    cols: 15,
+    difficulty: "Hard",
+    isPublished: true,
+    clues: {
+      across: [
+        { number: 1, clue: "Language named after a snake", answer: "PYTHON", row: 0, col: 0 },
+        { number: 4, clue: "Language known for its coffee cup logo", answer: "JAVA", row: 2, col: 0 },
+        { number: 6, clue: "System programming language from Google", answer: "GOLANG", row: 4, col: 0 }
+      ],
+      down: [
+        { number: 2, clue: "Scripting language for web pages", answer: "JAVASCRIPT", row: 0, col: 2 },
+        { number: 3, clue: "Language used for statistical computing", answer: "R", row: 0, col: 5 }
+      ]
+    }
   }
 ];
 
+// Helper to create a grid from clues
+function createGridFromClues(rows, cols, clues) {
+  const grid = Array(rows).fill(null).map(() => 
+    Array(cols).fill(null).map(() => ({ char: '', active: false, num: null }))
+  );
+
+  clues.across.forEach(c => {
+    grid[c.row][c.col].num = c.number;
+    for (let i = 0; i < c.answer.length; i++) {
+      if (c.col + i < cols) {
+        grid[c.row][c.col + i].char = c.answer[i];
+        grid[c.row][c.col + i].active = true;
+      }
+    }
+  });
+
+  clues.down.forEach(c => {
+    if (grid[c.row][c.col].num === null) {
+        grid[c.row][c.col].num = c.number;
+    }
+    for (let i = 0; i < c.answer.length; i++) {
+      if (c.row + i < rows) {
+        grid[c.row + i][c.col].char = c.answer[i];
+        grid[c.row + i][c.col].active = true;
+      }
+    }
+  });
+
+  return grid;
+}
+
 async function seed() {
   try {
-    console.log("Connecting to MongoDB...");
-    await mongoose.connect(MONGO_URI);
-    console.log("Connected!");
+    console.log("🌱 Connecting to MongoDB...");
+    await mongoose.connect(mongoUri);
+    console.log("✅ Connected.");
 
-    // 1. Get or Create Admin User
-    let admin = await User.findOne({ username: "admin_system" });
-    if (!admin) {
-      console.log("Creating admin user...");
-      admin = await User.create({
-        username: "admin_system",
-        email: "admin@crossword.com",
-        passwordHash: "hashed_dummy_password", // We don't need to login as this user really
-        name: "System Admin"
-      });
-    }
-    console.log(`Using Author: ${admin.username} (${admin._id})`);
-
-    // 2. Generate and Insert Crosswords
-    for (const data of DATASETS) {
-      console.log(`Generating: ${data.title}...`);
-      
-      const generator = new CrosswordGenerator(data.words);
-      const layout = generator.generate();
-
-      if (!layout) {
-        console.error(`Failed to generate layout for ${data.title}`);
-        continue;
+    // Find or Create Admin User
+    let adminUser = await User.findOne({ username: 'admin' });
+    if (!adminUser) {
+      // Try finding ANY user
+      adminUser = await User.findOne({});
+      if (!adminUser) {
+          console.log("👤 Creating seed admin user...");
+          adminUser = await User.create({
+            username: 'admin',
+            email: 'admin@example.com',
+            passwordHash: 'seed_password_hash_123',
+            name: 'System Admin'
+          });
       }
-
-      // Convert layout to schema format
-      // Layout from generator.finalize() returns: { grid, clues, ... } which matches schema closely?
-      // Let's verify what finalize returns vs schema.
-      
-      // Schema expects:
-      // grid: [[ { char, num, active } ]]
-      // clues: { across: [], down: [] }
-      // rows, cols
-      // words: original list
-
-      // finalize() returns:
-      // { finalGrid (grid), clues, rows, cols }
-      // But keys might be slightly different.
-      // In finalize():
-      // const finalGrid = ...
-      // const clues = { across: [], down: [] }
-      // return { grid: finalGrid, clues, rows, cols, placedWords } (Wait, I need to check the return statement of finalize)
-
-      // Let's assume the generator logic I read earlier.
-      // finalize code I read:
-      // ...
-      // return { grid: finalGrid, clues, rows, cols }; (I didn't see the return line in previous `Read`, let me assume standard structure)
-      
-      // Actually, looking at the code I read in `Read` output (lines 330-349...), it constructs `finalGrid`.
-      // I need to see the return statement of `finalize` to be sure.
-      // But I can reconstruct it if needed.
-      
-      // Let's assume standard properties.
-      
-      const newCrossword = new Crossword({
-        title: data.title,
-        description: data.description,
-        author: admin._id,
-        grid: layout.grid, // Assuming 'grid' key
-        clues: layout.clues,
-        rows: layout.rows,
-        cols: layout.cols,
-        words: data.words,
-        difficulty: data.difficulty,
-        isPublished: true
-      });
-
-      await newCrossword.save();
-      console.log(`Saved: ${data.title}`);
     }
+    console.log(`👤 Using author: ${adminUser.username} (${adminUser._id})`);
 
-    console.log("Seeding completed successfully!");
+    console.log("🧹 Clearing existing crosswords...");
+    await Crossword.deleteMany({});
+    console.log("✅ Cleared.");
+
+    console.log("📝 Preparing seed data...");
+    const seeds = sampleCrosswords.map(cw => {
+      return {
+        ...cw,
+        author: adminUser._id,
+        grid: createGridFromClues(cw.rows, cw.cols, cw.clues)
+      };
+    });
+
+    console.log("🚀 Inserting crosswords...");
+    await Crossword.insertMany(seeds);
+    console.log(`✅ Successfully seeded ${seeds.length} crosswords!`);
+
+    process.exit(0);
   } catch (err) {
-    console.error("Error seeding:", err);
-  } finally {
-    await mongoose.disconnect();
+    console.error("❌ Seed failed:", err);
+    process.exit(1);
   }
 }
 
-// Helper: We need to check what finalize returns exactly to match schema
-// I'll peek at the end of generator file again quickly before running.
 seed();
