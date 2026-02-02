@@ -233,7 +233,7 @@ class x {
 
 const b = new Map(),
   A = new r();
-let R = false;
+let areListenersAttached = false;
 function S(e) {
   const t = {
     position: new r(),
@@ -249,7 +249,7 @@ function S(e) {
   (function (e, t) {
     if (!b.has(e)) {
       b.set(e, t);
-      if (!R) {
+      if (!areListenersAttached) {
         document.body.addEventListener('pointermove', M);
         document.body.addEventListener('pointerleave', L);
         document.body.addEventListener('click', C);
@@ -259,7 +259,7 @@ function S(e) {
         document.body.addEventListener('touchend', TouchEnd, { passive: false });
         document.body.addEventListener('touchcancel', TouchEnd, { passive: false });
 
-        R = true;
+        areListenersAttached = true;
       }
     }
   })(e.domElement, t);
@@ -276,7 +276,7 @@ function S(e) {
       document.body.removeEventListener('touchend', TouchEnd);
       document.body.removeEventListener('touchcancel', TouchEnd);
 
-      R = false;
+      areListenersAttached = false;
     }
   };
   return t;
@@ -413,10 +413,10 @@ class W {
     this.velocityData = new Float32Array(3 * e.count).fill(0);
     this.sizeData = new Float32Array(e.count).fill(1);
     this.center = new a();
-    this.#R();
+    this.#initPositions();
     this.setSizes();
   }
-  #R() {
+  #initPositions() {
     const { config: e, positionData: t } = this;
     this.center.toArray(t, 0);
     for (let i = 1; i < e.count; i++) {
