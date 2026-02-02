@@ -35,6 +35,23 @@ const ShareModal = ({ isOpen, onClose, stats, theme }) => {
 
   if (!isOpen) return null;
 
+  const handleShare = async () => {
+    if (!imageUrl || !navigator.share) return;
+    
+    try {
+      const res = await fetch(imageUrl);
+      const blob = await res.blob();
+      const file = new File([blob], 'score.png', { type: 'image/png' });
+      
+      await navigator.share({
+        title: 'My Crossword Score',
+        files: [file]
+      });
+    } catch (err) {
+      console.error("Error sharing:", err);
+    }
+  };
+
   const formatTime = (seconds) => {
     const m = Math.floor(seconds / 60);
     const s = seconds % 60;

@@ -209,14 +209,16 @@ function CrosswordPlayer() {
         setLoading(false);
         // Set initial focus to first numbered cell
         // Find cell with num 1
+        let found = false;
         for(let r=0; r<cw.rows; r++) {
             for(let c=0; c<cw.cols; c++) {
                 if (cw.grid[r][c]?.num === 1) {
                     setActiveCell({row: r, col: c});
+                    found = true;
                     break;
                 }
             }
-            if (activeCell) break;
+            if (found) break;
         }
       })
       .catch(err => {

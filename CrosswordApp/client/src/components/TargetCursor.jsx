@@ -36,7 +36,7 @@ const TargetCursor = ({
   );
 
   const moveCursor = useCallback((x, y) => {
-    if (!cursorRef.current) return;
+    if (!cursorRef.current || !gsap) return;
     gsap.to(cursorRef.current, {
       x,
       y,
@@ -46,7 +46,7 @@ const TargetCursor = ({
   }, []);
 
   useEffect(() => {
-    if (isMobile || !cursorRef.current) return;
+    if (isMobile || !cursorRef.current || !gsap) return;
 
     const originalCursor = document.body.style.cursor;
     if (hideDefaultCursor) {
