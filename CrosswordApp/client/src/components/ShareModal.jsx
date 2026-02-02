@@ -1,5 +1,4 @@
 import React, { useRef, useState } from 'react';
-import html2canvas from 'html2canvas';
 import { FaShareAlt, FaDownload, FaTimes, FaInstagram, FaWhatsapp } from 'react-icons/fa';
 
 const ShareModal = ({ isOpen, onClose, stats, theme }) => {
@@ -11,6 +10,7 @@ const ShareModal = ({ isOpen, onClose, stats, theme }) => {
     if (!cardRef.current) return;
     setLoading(true);
     try {
+      const html2canvas = (await import('html2canvas')).default;
       const canvas = await html2canvas(cardRef.current, {
         scale: 2,
         backgroundColor: null,

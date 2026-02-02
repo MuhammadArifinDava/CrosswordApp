@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef, useMemo, useCallback } from "react";
+import { useEffect, useState, useRef, useMemo, useCallback, lazy, Suspense } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { api } from "../lib/api";
 import { Container } from "../components/Container";
@@ -8,18 +8,14 @@ import { Alert } from "../components/Alert";
 import { VscCheck, VscChromeClose, VscDebugRestart, VscLightbulb, VscColorMode, VscFilePdf, VscShare, VscAdd, VscRemove } from "react-icons/vsc";
 import { FaTrophy, FaPalette, FaRobot, FaUserFriends } from "react-icons/fa";
 import confetti from "canvas-confetti";
-import jsPDF from "jspdf";
-import autoTable from "jspdf-autotable";
-
-// Hooks
 import { useSound } from "../hooks/useSound";
 import { useTheme } from "../hooks/useTheme";
 import { useAchievements } from "../hooks/useAchievements";
 import { useDragScroll } from "../hooks/useDragScroll";
 import { useAuth } from "../context/useAuth";
-import ShareModal from "../components/ShareModal";
-
 import { io } from "socket.io-client";
+
+const ShareModal = lazy(() => import("../components/ShareModal"));
 
 // ... existing imports
 
@@ -505,7 +501,9 @@ function CrosswordPlayer() {
        .catch(err => console.error(err));
   }, [id]);
 
-  const handleExportPDF = () => {
+  const handleExportPDF = async () => {
+    const { default: jsPDF } = await import("jspdf");
+    const { default: autoTable } = await import("jspdf-autotable");
     const doc = new jsPDF();
     
     // Title
@@ -1000,16 +998,18 @@ function CrosswordPlayer() {
       )}
 
       {/* Share Modal */}
-      <ShareModal 
-          isOpen={showShareModal} 
-          onClose={() => setShowShareModal(false)} 
-          stats={{
-              timeSolved: timer,
-              hintsUsed: 3 - hintsRemaining,
-              score: finalScore
-          }}
-          theme={theme}
-      />
+      <Suspense fallback={null}>
+        <ShareModal 
+            isOpen={showShareModal} 
+            onClose={() => setShowShareModal(false)} 
+            stats={{
+                timeSolved: timer,
+                hintsUsed: 3 - hintsRemaining,
+                errors: 0 // Placeholder
+            }}
+            theme={theme}
+        />
+      </Suspense>
 
       {/* Achievement Unlock Notification */}
       {newUnlock && (
