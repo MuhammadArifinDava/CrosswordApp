@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef, useMemo, useCallback, lazy, Suspense } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { api } from "../lib/api";
 import { Container } from "../components/Container";
 import { Spinner } from "../components/Spinner";
@@ -7,13 +7,13 @@ import { CrosswordGrid } from "../components/CrosswordGrid";
 import { Alert } from "../components/Alert";
 import { VscCheck, VscChromeClose, VscDebugRestart, VscLightbulb, VscColorMode, VscFilePdf, VscShare, VscAdd, VscRemove } from "react-icons/vsc";
 import { FaTrophy, FaPalette, FaRobot, FaUserFriends } from "react-icons/fa";
-import confetti from "canvas-confetti";
+
+// Hooks
 import { useSound } from "../hooks/useSound";
 import { useTheme } from "../hooks/useTheme";
 import { useAchievements } from "../hooks/useAchievements";
 import { useDragScroll } from "../hooks/useDragScroll";
 import { useAuth } from "../context/useAuth";
-import { io } from "socket.io-client";
 
 const ShareModal = lazy(() => import("../components/ShareModal"));
 
@@ -22,7 +22,6 @@ const ShareModal = lazy(() => import("../components/ShareModal"));
 function CrosswordPlayer() {
   const { id } = useParams();
   const { user } = useAuth(); // Assuming useAuth provides current user info
-  const navigate = useNavigate();
 
   // Custom Hooks
   // ...
@@ -36,60 +35,70 @@ function CrosswordPlayer() {
 
   // Initialize Socket
   useEffect(() => {
-    // Determine socket URL based on environment
-    const socketUrl = import.meta.env.VITE_API_URL || "http://localhost:5001";
-    const newSocket = io(socketUrl);
-    setSocket(newSocket);
+    let newSocket;
+    const initSocket = async () => {
+        try {
+            const { io } = await import("socket.io-client");
+            // Determine socket URL based on environment
+            const socketUrl = import.meta.env.VITE_API_URL || "http://localhost:5001";
+            newSocket = io(socketUrl);
+            setSocket(newSocket);
 
-    newSocket.on("connect", () => {
-        console.log("Connected to multiplayer server");
-        setIsConnected(true);
-        newSocket.emit("join_puzzle", id);
-    });
-
-    newSocket.on("disconnect", () => {
-        console.log("Disconnected from multiplayer server");
-        setIsConnected(false);
-    });
-
-    newSocket.on("connect_error", (err) => {
-        console.error("Socket connection error:", err);
-        setIsConnected(false);
-    });
-
-    newSocket.on("cell_updated", ({ row, col, char }) => {
-        setUserAnswers(prev => {
-            const newGrid = prev.map(r => [...r]);
-            newGrid[row][col] = char;
-            return newGrid;
-        });
-    });
-
-    // Sync Logic
-    newSocket.on("request_sync", ({ requesterId }) => {
-        if (answersRef.current && answersRef.current.length > 0) {
-            newSocket.emit("provide_sync", {
-                requesterId,
-                state: answersRef.current,
-                puzzleId: id
+            newSocket.on("connect", () => {
+                console.log("Connected to multiplayer server");
+                setIsConnected(true);
+                newSocket.emit("join_puzzle", id);
             });
+
+            newSocket.on("disconnect", () => {
+                console.log("Disconnected from multiplayer server");
+                setIsConnected(false);
+            });
+
+            newSocket.on("connect_error", (err) => {
+                console.error("Socket connection error:", err);
+                setIsConnected(false);
+            });
+
+            newSocket.on("cell_updated", ({ row, col, char }) => {
+                setUserAnswers(prev => {
+                    const newGrid = prev.map(r => [...r]);
+                    newGrid[row][col] = char;
+                    return newGrid;
+                });
+            });
+
+            // Sync Logic
+            newSocket.on("request_sync", ({ requesterId }) => {
+                if (answersRef.current && answersRef.current.length > 0) {
+                    newSocket.emit("provide_sync", {
+                        requesterId,
+                        state: answersRef.current,
+                        puzzleId: id
+                    });
+                }
+            });
+
+            newSocket.on("apply_sync", (remoteState) => {
+                console.log("Received sync state from peer");
+                setUserAnswers(remoteState);
+            });
+
+            newSocket.on("remote_cursor_moved", ({ id: socketId, user, row, col }) => {
+                setRemoteCursors(prev => ({
+                    ...prev,
+                    [socketId]: { user, row, col }
+                }));
+            });
+        } catch (error) {
+            console.error("Failed to load socket.io-client", error);
         }
-    });
+    };
 
-    newSocket.on("apply_sync", (remoteState) => {
-        console.log("Received sync state from peer");
-        setUserAnswers(remoteState);
-    });
-
-    newSocket.on("remote_cursor_moved", ({ id: socketId, user, row, col }) => {
-        setRemoteCursors(prev => ({
-            ...prev,
-            [socketId]: { user, row, col }
-        }));
-    });
+    initSocket();
 
     return () => {
-        newSocket.disconnect();
+        if (newSocket) newSocket.disconnect();
     };
   }, [id]);
 
@@ -105,7 +114,7 @@ function CrosswordPlayer() {
     }
   }, [activeCell, socket, id, user]);
 
-  // ... existing code ...{ playClick, playSuccess, playError, playVictory } = useSound();
+  const { playClick, playSuccess, playError, playVictory } = useSound();
   const { theme, setTheme } = useTheme();
   const { checkAchievements, newUnlock } = useAchievements();
   
@@ -243,11 +252,13 @@ function CrosswordPlayer() {
 
     if (complete && correct) {
       setIsComplete(true);
-      confetti({
-        particleCount: 150,
-        spread: 70,
-        origin: { y: 0.6 },
-        colors: ['#26ccff', '#a25afd', '#ff5e7e', '#88ff5a', '#fcff42', '#ffa62d', '#ff36ff']
+      import("canvas-confetti").then(({ default: confetti }) => {
+        confetti({
+          particleCount: 150,
+          spread: 70,
+          origin: { y: 0.6 },
+          colors: ['#26ccff', '#a25afd', '#ff5e7e', '#88ff5a', '#fcff42', '#ffa62d', '#ff36ff']
+        });
       });
     }
   }, [userAnswers, crossword, isComplete]);
@@ -502,40 +513,44 @@ function CrosswordPlayer() {
   }, [id]);
 
   const handleExportPDF = async () => {
-    const { default: jsPDF } = await import("jspdf");
-    const { default: autoTable } = await import("jspdf-autotable");
-    const doc = new jsPDF();
-    
-    // Title
-    doc.setFontSize(22);
-    doc.text(crossword.title, 105, 20, { align: "center" });
-    
-    doc.setFontSize(12);
-    doc.text(crossword.description || "", 105, 30, { align: "center" });
+    try {
+        const { default: jsPDF } = await import("jspdf");
+        const { default: autoTable } = await import("jspdf-autotable");
+        const doc = new jsPDF();
+        
+        // Title
+        doc.setFontSize(22);
+        doc.text(crossword.title, 105, 20, { align: "center" });
+        
+        doc.setFontSize(12);
+        doc.text(crossword.description || "", 105, 30, { align: "center" });
 
-    // Clues
-    const acrossClues = crossword.clues.across.map(c => [`${c.number}. ${c.clue}`]);
-    const downClues = crossword.clues.down.map(c => [`${c.number}. ${c.clue}`]);
+        // Clues
+        const acrossClues = crossword.clues.across.map(c => [`${c.number}. ${c.clue}`]);
+        const downClues = crossword.clues.down.map(c => [`${c.number}. ${c.clue}`]);
 
-    doc.setFontSize(14);
-    doc.text("Across", 14, 40);
-    doc.text("Down", 110, 40);
+        doc.setFontSize(14);
+        doc.text("Across", 14, 40);
+        doc.text("Down", 110, 40);
 
-    autoTable(doc, {
-        body: acrossClues,
-        startY: 45,
-        theme: 'plain',
-        margin: { right: 110 } // Left column
-    });
+        autoTable(doc, {
+            body: acrossClues,
+            startY: 45,
+            theme: 'plain',
+            margin: { right: 110 } // Left column
+        });
 
-    autoTable(doc, {
-        body: downClues,
-        startY: 45,
-        theme: 'plain',
-        margin: { left: 110 } // Right column
-    });
-    
-    doc.save(`${crossword.title}.pdf`);
+        autoTable(doc, {
+            body: downClues,
+            startY: 45,
+            theme: 'plain',
+            margin: { left: 110 } // Right column
+        });
+        
+        doc.save(`${crossword.title}.pdf`);
+    } catch (error) {
+        console.error("Failed to load PDF libraries", error);
+    }
   };
 
   const checkAnswers = async () => {
@@ -567,10 +582,12 @@ function CrosswordPlayer() {
           };
           checkAchievements(stats);
           
-          confetti({
-               particleCount: 150,
-               spread: 70,
-               origin: { y: 0.6 }
+          import("canvas-confetti").then(({ default: confetti }) => {
+               confetti({
+                    particleCount: 150,
+                    spread: 70,
+                    origin: { y: 0.6 }
+               });
           });
           
           // Calculate Score
@@ -1005,7 +1022,7 @@ function CrosswordPlayer() {
             stats={{
                 timeSolved: timer,
                 hintsUsed: 3 - hintsRemaining,
-                errors: 0 // Placeholder
+                score: finalScore
             }}
             theme={theme}
         />

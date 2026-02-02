@@ -1,5 +1,4 @@
 import { useState, useEffect, useCallback } from 'react';
-import confetti from 'canvas-confetti';
 
 const ACHIEVEMENT_DEFINITIONS = [
   {
@@ -69,10 +68,12 @@ export const useAchievements = () => {
       setNewUnlock(achInfo);
       
       // Confetti!
-      confetti({
-        particleCount: 150,
-        spread: 70,
-        origin: { y: 0.6 }
+      import('canvas-confetti').then(({ default: confetti }) => {
+        confetti({
+          particleCount: 150,
+          spread: 70,
+          origin: { y: 0.6 }
+        });
       });
       
       // Auto dismiss
