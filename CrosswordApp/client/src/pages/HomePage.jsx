@@ -25,8 +25,9 @@ function HomePage() {
     <Container>
       <div className="py-12">
         <div className="text-center mb-12">
+            <img src="/crossword.svg" alt="Crossword Logo" className="w-20 h-20 mx-auto mb-6" />
             <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4 tracking-tight">
-                Crossword Puzzles
+                Crossword
             </h1>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
                 Challenge your mind with our collection of community-created crosswords.
