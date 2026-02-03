@@ -29,7 +29,7 @@ function HomePage() {
             <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4 tracking-tight">
                 Crossword
             </h1>
-            <p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+            <p className="text-lg text-gray-600 dark:text-gray-200 max-w-2xl mx-auto">
                 Challenge your mind with our collection of community-created crosswords.
             </p>
         </div>
@@ -53,14 +53,14 @@ function HomePage() {
                                     {cw.difficulty || 'Medium'}
                                 </span>
                             </div>
-                            <p className="text-gray-600 dark:text-gray-300 text-sm mb-4 line-clamp-2">
+                            <p className="text-gray-600 dark:text-gray-200 text-sm mb-4 line-clamp-2">
                                 {cw.description || "No description provided."}
                             </p>
                             <div className="flex items-center justify-between mt-auto pt-4 border-t border-black/5 dark:border-white/10">
-                                <span className="text-xs text-gray-500 dark:text-gray-400">
+                                <span className="text-xs text-gray-500 dark:text-gray-300">
                                     By {cw.author?.username || "Unknown"}
                                 </span>
-                                <span className="flex items-center gap-1 text-sm font-semibold text-gray-700 dark:text-gray-300 group-hover:text-blue-600 dark:group-hover:text-blue-400">
+                                <span className="flex items-center gap-1 text-sm font-semibold text-gray-700 dark:text-gray-200 group-hover:text-blue-600 dark:group-hover:text-blue-400">
                                     <VscPlay /> Play
                                 </span>
                             </div>

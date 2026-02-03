@@ -120,20 +120,20 @@ function CrosswordCreator() {
   return (
     <Container>
       <div className="py-8 pb-32">
-        <h1 className="text-3xl font-bold mb-8 text-gray-900">Create New Crossword</h1>
+        <h1 className="text-3xl font-bold mb-8 text-gray-900 dark:text-white">Create New Crossword</h1>
         
         <div className="flex flex-col xl:flex-row gap-8 items-start">
             {/* Left Column: Form */}
             <div className="w-full xl:w-1/2 space-y-6">
                 <div className="surface rounded-3xl p-6 md:p-8 shadow-sm">
-                    <h2 className="text-xl font-bold mb-4 flex items-center gap-2 text-gray-900">
+                    <h2 className="text-xl font-bold mb-4 flex items-center gap-2 text-gray-900 dark:text-white">
                         <VscSymbolKeyword className="text-blue-500" />
                         Details & Words
                     </h2>
 
                     {error && <Alert className="mb-6">{error}</Alert>}
                     {validationWarning && (
-                        <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-xl text-yellow-800 flex items-start gap-3">
+                        <div className="mb-6 p-4 bg-yellow-50 dark:bg-yellow-900/30 border border-yellow-200 dark:border-yellow-700 rounded-xl text-yellow-800 dark:text-yellow-200 flex items-start gap-3">
                             <span className="text-xl">⚠️</span>
                             <div>
                                 <p className="font-bold">Partial Generation</p>
@@ -144,22 +144,22 @@ function CrosswordCreator() {
 
                     <div className="space-y-4 mb-8">
                         <div>
-                            <label className="block text-sm font-medium text-gray-600 mb-2">Title</label>
+                            <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 mb-2">Title</label>
                             <input
                                 type="text"
                                 value={title}
                                 onChange={(e) => setTitle(e.target.value)}
-                                className="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-gray-900 focus:outline-none focus:border-blue-500 transition-colors"
+                                className="w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-3 text-gray-900 dark:text-white focus:outline-none focus:border-blue-500 transition-colors"
                                 placeholder="e.g. Science Fun"
                             />
                         </div>
                         
                         <div>
-                            <label className="block text-sm font-medium text-gray-600 mb-2">Difficulty</label>
+                            <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 mb-2">Difficulty</label>
                             <select
                                 value={difficulty}
                                 onChange={(e) => setDifficulty(e.target.value)}
-                                className="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-gray-900 focus:outline-none focus:border-blue-500 transition-colors"
+                                className="w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-3 text-gray-900 dark:text-white focus:outline-none focus:border-blue-500 transition-colors"
                             >
                                 <option value="Easy">Easy</option>
                                 <option value="Medium">Medium</option>
@@ -168,18 +168,18 @@ function CrosswordCreator() {
                         </div>
 
                         <div>
-                            <label className="block text-sm font-medium text-gray-600 mb-2">Description (Optional)</label>
+                            <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 mb-2">Description (Optional)</label>
                             <textarea
                                 value={description}
                                 onChange={(e) => setDescription(e.target.value)}
-                                className="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-gray-900 focus:outline-none focus:border-blue-500 transition-colors h-24 resize-none"
+                                className="w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-3 text-gray-900 dark:text-white focus:outline-none focus:border-blue-500 transition-colors h-24 resize-none"
                                 placeholder="A brief description..."
                             />
                         </div>
                     </div>
 
                     <div className="space-y-3">
-                        <div className="flex justify-between items-center text-sm text-gray-400 uppercase tracking-wider font-bold mb-2">
+                        <div className="flex justify-between items-center text-sm text-gray-400 dark:text-gray-500 uppercase tracking-wider font-bold mb-2">
                             <span>Word</span>
                             <span>Clue</span>
                             <span className="w-8"></span>
@@ -190,14 +190,14 @@ function CrosswordCreator() {
                                     type="text"
                                     value={w.word}
                                     onChange={(e) => handleWordChange(i, "word", e.target.value.toUpperCase())}
-                                    className="w-1/3 bg-white border border-gray-200 rounded-xl px-4 py-2 text-gray-900 font-mono uppercase focus:outline-none focus:border-blue-500"
+                                    className="w-1/3 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-2 text-gray-900 dark:text-white font-mono uppercase focus:outline-none focus:border-blue-500"
                                     placeholder="WORD"
                                 />
                                 <input
                                     type="text"
                                     value={w.clue}
                                     onChange={(e) => handleWordChange(i, "clue", e.target.value)}
-                                    className="flex-1 bg-white border border-gray-200 rounded-xl px-4 py-2 text-gray-900 focus:outline-none focus:border-blue-500"
+                                    className="flex-1 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-2 text-gray-900 dark:text-white focus:outline-none focus:border-blue-500"
                                     placeholder="Clue for this word"
                                 />
                                 <button
@@ -218,7 +218,7 @@ function CrosswordCreator() {
                         <VscAdd /> Add Another Word
                     </button>
 
-                    <div className="mt-8 pt-6 border-t border-gray-200 flex gap-4">
+                    <div className="mt-8 pt-6 border-t border-gray-200 dark:border-gray-800 flex gap-4">
                         <button
                             onClick={handleGenerate}
                             disabled={busy}
@@ -236,20 +236,20 @@ function CrosswordCreator() {
                 <div className="sticky top-24">
                     <div className={`surface rounded-3xl p-6 md:p-8 min-h-[400px] flex flex-col items-center justify-center text-center transition-all shadow-sm ${generatedData ? 'border-blue-500/30 shadow-[0_0_50px_-12px_rgba(59,130,246,0.3)]' : ''}`}>
                         {!generatedData ? (
-                            <div className="text-gray-400">
+                            <div className="text-gray-400 dark:text-gray-500">
                                 <div className="text-6xl mb-4 opacity-50">🧩</div>
                                 <p>Add words and click Generate to see the preview here.</p>
                             </div>
                         ) : (
                             <div className="w-full">
                                 <div className="flex justify-between items-center mb-6">
-                                    <h3 className="text-lg font-bold text-gray-900">Preview</h3>
-                                    <div className="text-sm px-3 py-1 bg-gray-100 rounded-full text-gray-600">
+                                    <h3 className="text-lg font-bold text-gray-900 dark:text-white">Preview</h3>
+                                    <div className="text-sm px-3 py-1 bg-gray-100 dark:bg-gray-700 rounded-full text-gray-600 dark:text-gray-300">
                                         {generatedData.placedCount} / {generatedData.totalWords} words placed
                                     </div>
                                 </div>
                                 
-                                <div className="overflow-auto max-h-[600px] flex justify-center p-4 bg-gray-100 rounded-2xl mb-6">
+                                <div className="overflow-auto max-h-[600px] flex justify-center p-4 bg-gray-100 dark:bg-gray-800 rounded-2xl mb-6">
                                     <CrosswordGrid
                                         grid={generatedData.grid}
                                         rows={generatedData.rows}

@@ -230,6 +230,7 @@ class CrosswordGenerator {
 
   canPlace(grid, word, row, col, direction) {
     // Check bounds
+    // checking if word fits. dont want crash or ugly overlaps.
     if (row < 0 || col < 0 || 
         (direction === "across" && col + word.length >= this.gridSize) ||
         (direction === "down" && row + word.length >= this.gridSize)) {
@@ -253,6 +254,7 @@ class CrosswordGenerator {
       
       if (existing === null) {
         // Check immediate neighbors perpendicular to placement direction
+        // make sure we dont touch other words by accident. no illegal 2-letter words allowed.
         if (direction === "across") {
           if (grid[r-1]?.[c] || grid[r+1]?.[c]) return false;
         } else {

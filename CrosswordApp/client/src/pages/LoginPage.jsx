@@ -49,11 +49,11 @@ function LoginPage() {
       >
         <div className="card-3d surface rounded-[32px] bg-white p-8 shadow-xl">
           <div>
-            <p className="text-xs uppercase tracking-[0.28em] text-slate-500 dark:text-slate-400">Welcome back</p>
+            <p className="text-xs uppercase tracking-[0.28em] text-slate-500 dark:text-slate-300">Welcome back</p>
             <h1 className="mt-4 font-display text-2xl sm:text-3xl font-semibold tracking-tight text-slate-900 dark:text-white">
               Sign in to continue.
             </h1>
-            <p className="mt-3 text-sm leading-7 text-slate-600 dark:text-slate-300">
+            <p className="mt-3 text-sm leading-7 text-slate-600 dark:text-slate-200">
               Access your saved drafts, bookmarks, and profile.
             </p>
           </div>
@@ -76,7 +76,7 @@ function LoginPage() {
                 />
               </div>
               <div>
-                <label className="block text-xs uppercase tracking-[0.24em] text-slate-500 dark:text-slate-400">Password</label>
+                <label className="block text-xs uppercase tracking-[0.24em] text-slate-500 dark:text-slate-300">Password</label>
                 <input
                   type="password"
                   value={password}

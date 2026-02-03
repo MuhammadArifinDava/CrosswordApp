@@ -132,6 +132,7 @@ function CrosswordPlayer() {
   
   // Ref for preventing double input
   const lastKeyTime = useRef(0);
+  const processingHint = useRef(false);
 
   // State
   const [crossword, setCrossword] = useState(null);
@@ -497,7 +498,7 @@ function CrosswordPlayer() {
   };
 
   const handleHint = () => {
-      if (hintsRemaining <= 0 || isComplete || !activeCell) return;
+      if (hintsRemaining <= 0 || isComplete || !activeCell || processingHint.current) return;
       
       const { row, col } = activeCell;
       const correctChar = crossword.grid[row][col]?.char;
@@ -509,11 +510,17 @@ function CrosswordPlayer() {
           return;
       }
       
+      processingHint.current = true;
       const newAnswers = [...userAnswers];
       newAnswers[row] = [...newAnswers[row]];
       newAnswers[row][col] = correctChar;
       setUserAnswers(newAnswers);
-      setHintsRemaining(h => h - 1);
+      setHintsRemaining(h => Math.max(0, h - 1));
+
+      // Reset processing flag after a short delay
+      setTimeout(() => {
+          processingHint.current = false;
+      }, 300);
   };
 
   const fetchLeaderboard = useCallback(() => {
@@ -771,7 +778,7 @@ function CrosswordPlayer() {
                         by {crossword.author?.username || 'Unknown'}
                     </span>
                 </div>
-                <p className="text-gray-600 dark:text-gray-400 text-sm transition-colors">{crossword.description}</p>
+                <p className="text-gray-600 dark:text-gray-300 text-sm transition-colors">{crossword.description}</p>
             </div>
             <div className="flex flex-col items-end gap-2">
                 <div className="flex gap-2">
@@ -823,7 +830,7 @@ function CrosswordPlayer() {
                 </div>
                 <div className="text-right">
                     <div className="text-2xl font-mono font-bold text-blue-600 dark:text-blue-400 transition-colors">{formatTime(timer)}</div>
-                    <div className="text-xs text-gray-500 dark:text-gray-500 uppercase tracking-widest">Time</div>
+                    <div className="text-xs text-gray-500 dark:text-gray-300 uppercase tracking-widest">Time</div>
                 </div>
             </div>
         </div>
@@ -919,6 +926,7 @@ function CrosswordPlayer() {
                     <button 
                         onClick={() => {
                             if(confirm("Restart puzzle?")) {
+                                localStorage.removeItem(`crossword_progress_${id}`);
                                 window.location.reload();
                             }
                         }}
@@ -992,7 +1000,7 @@ function CrosswordPlayer() {
                                     className={`p-3 rounded-xl cursor-pointer transition-colors border border-transparent clue-item ${
                                         currentClue === clue && direction === "down" 
                                         ? "bg-purple-100 dark:bg-purple-900/40 border-purple-200 dark:border-purple-800 text-purple-800 dark:text-purple-300" 
-                                        : "hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300"
+                                        : "hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200"
                                     }`}
                                 >
                                     <span className="font-bold text-purple-600 dark:text-purple-400 mr-2">{clue.number}.</span>
@@ -1027,12 +1035,12 @@ function CrosswordPlayer() {
                       <VscCheck size={40} />
                   </div>
                   <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Puzzle Solved!</h2>
-                  <p className="text-gray-600 dark:text-gray-400 mb-2">Great job! You completed <strong>{crossword.title}</strong>.</p>
+                  <p className="text-gray-600 dark:text-gray-200 mb-2">Great job! You completed <strong>{crossword.title}</strong>.</p>
                   
                   <div className="bg-gray-50 dark:bg-gray-700/50 rounded-xl p-4 mb-6">
-                      <div className="text-sm text-gray-500 dark:text-gray-400 uppercase tracking-wide font-bold mb-1">Final Score</div>
-                      <div className="text-4xl font-mono font-bold text-blue-600 dark:text-blue-400">{finalScore}</div>
-                      <div className="text-sm text-gray-500 dark:text-gray-400 mt-2">Time: {formatTime(timer)}</div>
+                      <div className="text-sm text-gray-500 dark:text-gray-300 uppercase tracking-wide font-bold mb-1">Final Score</div>
+                      <div className="text-4xl font-mono font-bold text-blue-600 dark:text-blue-300">{finalScore}</div>
+                      <div className="text-sm text-gray-500 dark:text-gray-300 mt-2">Time: {formatTime(timer)}</div>
                   </div>
                   
                   <div className="flex gap-4 justify-center">
@@ -1063,7 +1071,7 @@ function CrosswordPlayer() {
                       </h2>
                       <button 
                           onClick={() => setShowLeaderboard(false)}
-                          className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition-colors text-gray-500 dark:text-gray-400"
+                          className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full transition-colors text-gray-500 dark:text-gray-300"
                       >
                           <VscChromeClose size={24} />
                       </button>
@@ -1071,12 +1079,12 @@ function CrosswordPlayer() {
                   
                   <div className="flex-1 overflow-y-auto custom-scrollbar pr-2">
                       {leaderboardData.length === 0 ? (
-                          <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+                          <div className="text-center py-8 text-gray-500 dark:text-gray-300">
                               No scores yet. Be the first!
                           </div>
                       ) : (
                           <table className="w-full text-left">
-                              <thead className="text-xs uppercase text-gray-500 dark:text-gray-400 font-bold border-b border-gray-200 dark:border-gray-700">
+                              <thead className="text-xs uppercase text-gray-500 dark:text-gray-300 font-bold border-b border-gray-200 dark:border-gray-700">
                                   <tr>
                                       <th className="pb-3 pl-2">Rank</th>
                                       <th className="pb-3">User</th>
@@ -1087,15 +1095,15 @@ function CrosswordPlayer() {
                               <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
                                   {leaderboardData.map((score, index) => (
                                       <tr key={index} className={`text-sm ${index < 3 ? 'font-bold' : ''}`}>
-                                          <td className="py-3 pl-2 text-gray-500 dark:text-gray-400">
+                                          <td className="py-3 pl-2 text-gray-500 dark:text-gray-300">
                                               {index === 0 && '🥇'}
                                               {index === 1 && '🥈'}
                                               {index === 2 && '🥉'}
                                               {index > 2 && `#${index + 1}`}
                                           </td>
                                           <td className="py-3 text-gray-900 dark:text-white">{score.user?.username || 'Anonymous'}</td>
-                                          <td className="py-3 text-blue-600 dark:text-blue-400">{score.score}</td>
-                                          <td className="py-3 text-right pr-2 text-gray-500 dark:text-gray-400 font-mono">{formatTime(score.timeSeconds)}</td>
+                                          <td className="py-3 text-blue-600 dark:text-blue-300">{score.score}</td>
+                                          <td className="py-3 text-right pr-2 text-gray-500 dark:text-gray-300 font-mono">{formatTime(score.timeSeconds)}</td>
                                       </tr>
                                   ))}
                               </tbody>

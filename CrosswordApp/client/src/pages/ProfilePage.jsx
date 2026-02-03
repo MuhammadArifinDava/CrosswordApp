@@ -34,7 +34,7 @@ function ProfilePage() {
         <div className="flex flex-col md:flex-row items-center justify-between mb-12 gap-6">
             <div>
                 <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">My Profile</h1>
-                <p className="text-gray-600 dark:text-white/60">Manage your account and puzzles</p>
+                <p className="text-gray-600 dark:text-gray-200">Manage your account and puzzles</p>
             </div>
             <div className="flex gap-4">
                 <button 
@@ -93,7 +93,7 @@ function ProfilePage() {
                 
                 {crosswords.length === 0 && (
                     <div className="col-span-full text-center py-12 surface rounded-3xl border border-dashed border-black/10 dark:border-white/10">
-                        <p className="text-gray-500 dark:text-white/40 mb-4">You haven't created any puzzles yet.</p>
+                        <p className="text-gray-500 dark:text-gray-400 mb-4">You haven't created any puzzles yet.</p>
                         <Link to="/create" className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-semibold">
                             Create your first puzzle
                         </Link>

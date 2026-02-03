@@ -84,7 +84,7 @@ function RegisterPage() {
                 />
               </div>
               <div>
-                <label className="block text-xs uppercase tracking-[0.24em] text-slate-500 dark:text-slate-400">Username</label>
+                <label className="block text-xs uppercase tracking-[0.24em] text-slate-500 dark:text-slate-300">Username</label>
                 <input
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
@@ -103,7 +103,7 @@ function RegisterPage() {
                 />
               </div>
               <div>
-                <label className="block text-xs uppercase tracking-[0.24em] text-slate-500 dark:text-slate-400">Password</label>
+                <label className="block text-xs uppercase tracking-[0.24em] text-slate-500 dark:text-slate-300">Password</label>
                 <input
                   type="password"
                   value={password}
