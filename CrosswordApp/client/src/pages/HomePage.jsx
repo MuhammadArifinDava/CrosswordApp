@@ -26,10 +26,10 @@ function HomePage() {
       <div className="py-12">
         <div className="text-center mb-12">
             <img src="/crossword.svg" alt="Crossword Logo" className="w-20 h-20 mx-auto mb-6" />
-            <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4 tracking-tight">
+            <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4 tracking-tight">
                 Crossword
             </h1>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+            <p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
                 Challenge your mind with our collection of community-created crosswords.
             </p>
         </div>
@@ -41,7 +41,7 @@ function HomePage() {
                 {crosswords.map(cw => (
                     <Link to={`/play/${cw._id}`} key={cw._id} className="group">
                         <div className="surface h-full rounded-2xl p-6 border border-black/5 hover:border-black/10 transition-all hover:translate-y-[-4px] shadow-sm hover:shadow-md">
-                            <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors">
+                            <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2 group-hover:text-blue-600 transition-colors">
                                 {cw.title}
                             </h3>
                             <div className="flex gap-2 mb-3">
@@ -53,14 +53,14 @@ function HomePage() {
                                     {cw.difficulty || 'Medium'}
                                 </span>
                             </div>
-                            <p className="text-gray-600 text-sm mb-4 line-clamp-2">
+                            <p className="text-gray-600 dark:text-gray-300 text-sm mb-4 line-clamp-2">
                                 {cw.description || "No description provided."}
                             </p>
-                            <div className="flex items-center justify-between mt-auto pt-4 border-t border-black/5">
-                                <span className="text-xs text-gray-500">
+                            <div className="flex items-center justify-between mt-auto pt-4 border-t border-black/5 dark:border-white/10">
+                                <span className="text-xs text-gray-500 dark:text-gray-400">
                                     By {cw.author?.username || "Unknown"}
                                 </span>
-                                <span className="flex items-center gap-1 text-sm font-semibold text-gray-700 group-hover:text-blue-600">
+                                <span className="flex items-center gap-1 text-sm font-semibold text-gray-700 dark:text-gray-300 group-hover:text-blue-600 dark:group-hover:text-blue-400">
                                     <VscPlay /> Play
                                 </span>
                             </div>
