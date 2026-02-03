@@ -34,63 +34,73 @@ function signUserToken(user) {
 }
 
 async function register(req, res) {
-  const name = String(req.body.name || "").trim();
-  const username = String(req.body.username || "").trim();
-  const email = normalizeEmail(req.body.email);
-  const password = String(req.body.password || "");
+  try {
+    const name = String(req.body.name || "").trim();
+    const username = String(req.body.username || "").trim();
+    const email = normalizeEmail(req.body.email);
+    const password = String(req.body.password || "");
 
-  if (!username || !email || !password) {
-    return res.status(400).json({ message: "Field required" });
+    if (!username || !email || !password) {
+      return res.status(400).json({ message: "Field required" });
+    }
+
+    if (!isUsernameValid(username)) {
+      return res.status(400).json({ message: "Invalid username" });
+    }
+
+    if (!isEmailValid(email)) {
+      return res.status(400).json({ message: "Invalid email" });
+    }
+
+    if (!isPasswordValid(password)) {
+      return res.status(400).json({ message: "Invalid password" });
+    }
+
+    const existing = await User.findOne({ $or: [{ email }, { username }] });
+    if (existing) {
+      return res.status(409).json({ message: "User already exists" });
+    }
+
+    const passwordHash = await bcrypt.hash(password, 10);
+    const user = await User.create({ name: name || username, username, email, passwordHash });
+    const token = signUserToken(user);
+
+    return res.status(201).json({ user: user.toJSON(), token });
+  } catch (error) {
+    console.error("Register Error:", error);
+    return res.status(500).json({ message: "Internal Server Error" });
   }
-
-  if (!isUsernameValid(username)) {
-    return res.status(400).json({ message: "Invalid username" });
-  }
-
-  if (!isEmailValid(email)) {
-    return res.status(400).json({ message: "Invalid email" });
-  }
-
-  if (!isPasswordValid(password)) {
-    return res.status(400).json({ message: "Invalid password" });
-  }
-
-  const existing = await User.findOne({ $or: [{ email }, { username }] });
-  if (existing) {
-    return res.status(409).json({ message: "User already exists" });
-  }
-
-  const passwordHash = await bcrypt.hash(password, 10);
-  const user = await User.create({ name: name || username, username, email, passwordHash });
-  const token = signUserToken(user);
-
-  return res.status(201).json({ user: user.toJSON(), token });
 }
 
 async function login(req, res) {
-  const email = normalizeEmail(req.body.email);
-  const password = String(req.body.password || "");
+  try {
+    const email = normalizeEmail(req.body.email);
+    const password = String(req.body.password || "");
 
-  if (!email || !password) {
-    return res.status(400).json({ message: "Field required" });
+    if (!email || !password) {
+      return res.status(400).json({ message: "Field required" });
+    }
+
+    if (!isEmailValid(email)) {
+      return res.status(400).json({ message: "Invalid email" });
+    }
+
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    const ok = await bcrypt.compare(password, user.passwordHash);
+    if (!ok) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    const token = signUserToken(user);
+    return res.json({ user: user.toJSON(), token });
+  } catch (error) {
+    console.error("Login Error:", error);
+    return res.status(500).json({ message: "Internal Server Error" });
   }
-
-  if (!isEmailValid(email)) {
-    return res.status(400).json({ message: "Invalid email" });
-  }
-
-  const user = await User.findOne({ email });
-  if (!user) {
-    return res.status(401).json({ message: "Unauthorized" });
-  }
-
-  const ok = await bcrypt.compare(password, user.passwordHash);
-  if (!ok) {
-    return res.status(401).json({ message: "Unauthorized" });
-  }
-
-  const token = signUserToken(user);
-  return res.json({ user: user.toJSON(), token });
 }
 
 async function logout(_req, res) {

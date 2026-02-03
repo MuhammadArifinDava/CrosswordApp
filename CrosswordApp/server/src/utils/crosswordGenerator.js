@@ -339,16 +339,27 @@ class CrosswordGenerator {
 
     // Fill grid
     finalWords.forEach(w => {
+      // Safety check: skip words that are out of bounds
+      if (w.row < 0 || w.row >= rows || w.col < 0 || w.col >= cols) {
+        return;
+      }
+
       const key = `${w.row},${w.col}`;
       if (startPositions.has(key)) {
-         finalGrid[w.row][w.col].num = startPositions.get(key);
+         if (finalGrid[w.row] && finalGrid[w.row][w.col]) {
+             finalGrid[w.row][w.col].num = startPositions.get(key);
+         }
       }
 
       for (let i = 0; i < w.length; i++) {
         const r = w.direction === "across" ? w.row : w.row + i;
         const c = w.direction === "across" ? w.col + i : w.col;
-        finalGrid[r][c].char = w.word[i];
-        finalGrid[r][c].active = true;
+        
+        // Ensure cell exists before accessing
+        if (finalGrid[r] && finalGrid[r][c]) {
+            finalGrid[r][c].char = w.word[i];
+            finalGrid[r][c].active = true;
+        }
       }
     });
 
