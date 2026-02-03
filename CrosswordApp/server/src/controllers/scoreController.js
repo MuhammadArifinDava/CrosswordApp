@@ -41,8 +41,10 @@ exports.submitScore = asyncHandler(async (req, res) => {
     // Base: 1000
     // Hints: -50 * hintsUsed
     // Time: -1 * timeSeconds
-    let score = 1000 - (hintsUsed * 50) - timeSeconds;
-    if (score < 0) score = 0;
+    let score = 1500 - (hintsUsed * 50) - timeSeconds;
+    
+    // Ensure minimum score of 100 for successful completion
+    if (score < 100) score = 100;
 
     const newScore = await Score.create({
         user: req.user._id,
