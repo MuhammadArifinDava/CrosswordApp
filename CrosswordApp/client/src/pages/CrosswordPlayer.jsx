@@ -528,38 +528,141 @@ function CrosswordPlayer() {
         const { default: autoTable } = await import("jspdf-autotable");
         const doc = new jsPDF();
         
+        const pageWidth = doc.internal.pageSize.getWidth();
+        const pageHeight = doc.internal.pageSize.getHeight();
+        const margin = 15;
+        let yPos = 20;
+
+        // --- Header ---
+        // Brand / Website
+        doc.setFontSize(10);
+        doc.setTextColor(100);
+        doc.text("crosswordav.netlify.app", pageWidth - margin, 15, { align: "right" });
+
         // Title
-        doc.setFontSize(22);
-        doc.text(crossword.title, 105, 20, { align: "center" });
+        doc.setFontSize(24);
+        doc.setTextColor(0);
+        doc.setFont("helvetica", "bold");
+        doc.text(crossword.title, margin, yPos);
+        yPos += 10;
+
+        // Metadata
+        doc.setFontSize(10);
+        doc.setFont("helvetica", "normal");
+        doc.setTextColor(80);
+        const authorName = crossword.author?.username || "Unknown";
+        const difficulty = crossword.difficulty || "Medium";
+        const dateStr = new Date().toLocaleDateString();
+        doc.text(`Created by: ${authorName}  |  Difficulty: ${difficulty}  |  Date: ${dateStr}`, margin, yPos);
+        yPos += 10;
+
+        // Description
+        if (crossword.description) {
+            doc.setFontSize(11);
+            doc.setTextColor(60);
+            const splitDesc = doc.splitTextToSize(crossword.description, pageWidth - (margin * 2));
+            doc.text(splitDesc, margin, yPos);
+            yPos += (splitDesc.length * 5) + 10;
+        } else {
+            yPos += 5;
+        }
+
+        // --- Grid Drawing ---
+        const availableWidth = pageWidth - (margin * 2);
+        // Calculate cell size to fit width, but max out at 12mm
+        const cellSize = Math.min(12, availableWidth / crossword.cols);
+        const gridWidth = cellSize * crossword.cols;
+        const gridHeight = cellSize * crossword.rows;
         
-        doc.setFontSize(12);
-        doc.text(crossword.description || "", 105, 30, { align: "center" });
+        // Center grid horizontally
+        const gridX = margin + (availableWidth - gridWidth) / 2;
+        
+        // Check if grid fits on this page, else new page
+        if (yPos + gridHeight > pageHeight - 40) {
+            doc.addPage();
+            yPos = 20;
+        }
 
-        // Clues
-        const acrossClues = crossword.clues.across.map(c => [`${c.number}. ${c.clue}`]);
-        const downClues = crossword.clues.down.map(c => [`${c.number}. ${c.clue}`]);
+        doc.setDrawColor(0); // Black borders
+        doc.setLineWidth(0.2);
 
-        doc.setFontSize(14);
-        doc.text("Across", 14, 40);
-        doc.text("Down", 110, 40);
+        for (let r = 0; r < crossword.rows; r++) {
+            for (let c = 0; c < crossword.cols; c++) {
+                const cell = crossword.grid[r][c];
+                const cellX = gridX + (c * cellSize);
+                const cellY = yPos + (r * cellSize);
 
+                if (cell && cell.active) {
+                    // White cell
+                    doc.setFillColor(255, 255, 255);
+                    doc.rect(cellX, cellY, cellSize, cellSize, "FD"); // Fill and Draw
+
+                    // Number
+                    if (cell.num) {
+                        doc.setFontSize(cellSize * 0.35); // Scale font with cell
+                        doc.setTextColor(0);
+                        doc.text(String(cell.num), cellX + 1, cellY + (cellSize * 0.35));
+                    }
+                } else {
+                    // Black cell
+                    doc.setFillColor(0, 0, 0); // Black
+                    doc.rect(cellX, cellY, cellSize, cellSize, "F"); // Fill only
+                }
+            }
+        }
+
+        yPos += gridHeight + 15;
+
+        // --- Clues ---
+        // If yPos is low on page, start clues on new page
+        if (yPos > pageHeight - 60) {
+            doc.addPage();
+            yPos = 20;
+        }
+
+        // Prepare data for autoTable
+        const acrossData = crossword.clues.across.map(c => [`${c.number}. ${c.clue}`]);
+        const downData = crossword.clues.down.map(c => [`${c.number}. ${c.clue}`]);
+        
+        const colWidth = (pageWidth - (margin * 2.5)) / 2; // Split width with some gap
+
+        // Render Across Clues (Left Column)
         autoTable(doc, {
-            body: acrossClues,
-            startY: 45,
-            theme: 'plain',
-            margin: { right: 110 } // Left column
+            startY: yPos,
+            head: [['ACROSS']],
+            body: acrossData,
+            theme: 'striped',
+            headStyles: { fillColor: [59, 130, 246], textColor: 255, fontStyle: 'bold' }, // Blue header
+            styles: { fontSize: 10, cellPadding: 1.5 },
+            margin: { left: margin },
+            tableWidth: colWidth
         });
 
+        // Render Down Clues (Right Column) - same startY
         autoTable(doc, {
-            body: downClues,
-            startY: 45,
-            theme: 'plain',
-            margin: { left: 110 } // Right column
+            startY: yPos,
+            head: [['DOWN']],
+            body: downData,
+            theme: 'striped',
+            headStyles: { fillColor: [59, 130, 246], textColor: 255, fontStyle: 'bold' },
+            styles: { fontSize: 10, cellPadding: 1.5 },
+            margin: { left: margin + colWidth + (margin * 0.5) }, // Right column position
+            tableWidth: colWidth
         });
         
-        doc.save(`${crossword.title}.pdf`);
+        // Footer (Page Numbers)
+        const totalPages = doc.internal.getNumberOfPages();
+        for (let i = 1; i <= totalPages; i++) {
+            doc.setPage(i);
+            doc.setFontSize(8);
+            doc.setTextColor(150);
+            doc.text(`Page ${i} of ${totalPages} - Generated by CrosswordAV`, pageWidth / 2, pageHeight - 10, { align: "center" });
+        }
+        
+        doc.save(`${crossword.title.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.pdf`);
     } catch (error) {
-        console.error("Failed to load PDF libraries", error);
+        console.error("Failed to generate PDF", error);
+        alert("Failed to generate PDF. Please try again.");
     }
   };
 
@@ -772,8 +875,8 @@ function CrosswordPlayer() {
 
                 <div className="w-full overflow-auto custom-scrollbar" style={{ maxHeight: '80vh' }}>
                     <div 
-                        className="origin-top-left transition-transform duration-200 ease-out"
-                        style={{ 
+                        className="origin-top-left transition-transform duration-200 ease-out flex justify-center"
+                        style={{  
                             transform: `scale(${zoomLevel})`,
                             width: `${100 * zoomLevel}%`,
                             minWidth: 'min-content'

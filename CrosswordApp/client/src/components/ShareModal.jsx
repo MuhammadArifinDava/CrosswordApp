@@ -114,7 +114,7 @@ const ShareModal = ({ isOpen, onClose, stats, theme }) => {
 
               <div className="z-10 text-center mb-8">
                 <div className="text-sm opacity-60 mb-2">Play now at</div>
-                <div className="font-mono bg-black/20 rounded-lg py-2 px-4 inline-block">crossword-gacor.app</div>
+                <div className="font-mono bg-black/20 rounded-lg py-2 px-4 inline-block">crosswordav.netlify.app</div>
               </div>
             </div>
           </div>
