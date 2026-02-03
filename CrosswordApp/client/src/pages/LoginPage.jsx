@@ -49,11 +49,11 @@ function LoginPage() {
       >
         <div className="card-3d surface rounded-[32px] bg-white p-8 shadow-xl">
           <div>
-            <p className="text-xs uppercase tracking-[0.28em] text-slate-500">Welcome back</p>
-            <h1 className="mt-4 font-display text-2xl sm:text-3xl font-semibold tracking-tight text-slate-900">
+            <p className="text-xs uppercase tracking-[0.28em] text-slate-500 dark:text-slate-400">Welcome back</p>
+            <h1 className="mt-4 font-display text-2xl sm:text-3xl font-semibold tracking-tight text-slate-900 dark:text-white">
               Sign in to continue.
             </h1>
-            <p className="mt-3 text-sm leading-7 text-slate-600">
+            <p className="mt-3 text-sm leading-7 text-slate-600 dark:text-slate-300">
               Access your saved drafts, bookmarks, and profile.
             </p>
           </div>
@@ -66,37 +66,37 @@ function LoginPage() {
 
           <form onSubmit={onSubmit} className="mt-8 space-y-4">
               <div>
-                <label className="block text-xs uppercase tracking-[0.24em] text-slate-500">Email</label>
+                <label className="block text-xs uppercase tracking-[0.24em] text-slate-500 dark:text-slate-400">Email</label>
                 <input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="mt-3 w-full rounded-full border border-white/70 bg-white/80 px-5 py-3 text-sm outline-none transition focus:border-slate-300 focus:ring-2 focus:ring-black/10"
+                  className="mt-3 w-full rounded-full border border-white/70 bg-white/80 px-5 py-3 text-sm outline-none transition focus:border-slate-300 focus:ring-2 focus:ring-black/10 dark:bg-black/20 dark:border-white/10 dark:text-white dark:focus:ring-white/20"
                   placeholder="you@example.com"
                 />
               </div>
               <div>
-                <label className="block text-xs uppercase tracking-[0.24em] text-slate-500">Password</label>
+                <label className="block text-xs uppercase tracking-[0.24em] text-slate-500 dark:text-slate-400">Password</label>
                 <input
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="mt-3 w-full rounded-full border border-white/70 bg-white/80 px-5 py-3 text-sm outline-none transition focus:border-slate-300 focus:ring-2 focus:ring-black/10"
+                  className="mt-3 w-full rounded-full border border-white/70 bg-white/80 px-5 py-3 text-sm outline-none transition focus:border-slate-300 focus:ring-2 focus:ring-black/10 dark:bg-black/20 dark:border-white/10 dark:text-white dark:focus:ring-white/20"
                   placeholder="••••••••"
                 />
               </div>
               <button
                 type="submit"
                 disabled={busy}
-                className="w-full rounded-full bg-slate-900 px-5 py-3 text-sm font-semibold text-white shadow-[0_18px_60px_rgba(0,0,0,0.12)] transition hover:-translate-y-0.5 hover:bg-black disabled:opacity-50"
+                className="w-full rounded-full bg-slate-900 px-5 py-3 text-sm font-semibold text-white shadow-[0_18px_60px_rgba(0,0,0,0.12)] transition hover:-translate-y-0.5 hover:bg-black disabled:opacity-50 dark:bg-white dark:text-slate-900 dark:hover:bg-gray-200"
               >
                 {busy ? "Logging in..." : "Login"}
               </button>
             </form>
 
-            <div className="mt-6 text-sm text-slate-600">
+            <div className="mt-6 text-sm text-slate-600 dark:text-slate-400">
               No account?{" "}
-              <Link to="/register" className="font-semibold text-slate-900">
+              <Link to="/register" className="font-semibold text-slate-900 dark:text-white">
                 Register
               </Link>
             </div>
