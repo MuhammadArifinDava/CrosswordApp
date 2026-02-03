@@ -5,7 +5,7 @@ Project Submission untuk **Technical Test – Fullstack Web & Game Developer**
 
 ---
 
-## 🎮 Gambaran Umum
+##  Gambaran Umum
 Aplikasi ini adalah platform Crossword (TTS) lengkap yang terdiri dari **Creator Studio** untuk membuat puzzle dan **Player Interface** untuk memainkannya. Dibangun menggunakan teknologi web modern untuk performa maksimal, aksesibilitas instan, dan pengalaman pengguna yang responsif di desktop maupun mobile.
 
 ### Kenapa Web Tech (React) dan bukan Unity?
@@ -18,7 +18,7 @@ Meskipun Unity sangat powerful untuk game berat, untuk studi kasus Crossword ini
 
 ---
 
-## 🚀 Fitur Utama
+##  Fitur Utama
 
 ### 1. TTS Creator / Admin Panel
 *   **Auto-Generator Algoritma**: Cukup masukkan daftar kata & clue, sistem otomatis menyusun grid yang saling berpotongan (Interlocking).
@@ -69,7 +69,7 @@ Meskipun Unity sangat powerful untuk game berat, untuk studi kasus Crossword ini
 
 ---
 
-## 💻 Cara Menjalankan di Lokal
+##  Cara Menjalankan di Lokal
 
 ### Prasyarat
 *   Node.js (v16+)
@@ -132,5 +132,5 @@ Algoritma penyusunan Crossword bekerja dengan pendekatan **Heuristic Backtrackin
 
 ---
 
-**Dibuat oleh:** [Nama Anda]
+**Dibuat oleh:** Muhammad Arifin Dava
 **Untuk:** Technical Test PT. Memento Game Studios
