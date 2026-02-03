@@ -30,14 +30,20 @@ function CrosswordPlayer() {
   // Custom Hooks
   // ...
   
-  // Socket State
+  // Socket State (Multiplayer Disabled)
+  /*
   const [socket, setSocket] = useState(null);
   const [isConnected, setIsConnected] = useState(false);
   const [remoteCursors, setRemoteCursors] = useState({}); // { socketId: { user, row, col } }
+  */
+  const socket = null;
+  const isConnected = false;
+  const remoteCursors = {};
 
   // ... existing state
 
-  // Initialize Socket
+  // Initialize Socket (Disabled)
+  /*
   useEffect(() => {
     let newSocket;
     const initSocket = async () => {
@@ -105,8 +111,10 @@ function CrosswordPlayer() {
         if (newSocket) newSocket.disconnect();
     };
   }, [id]);
+  */
 
-  // Broadcast cursor moves
+  // Broadcast cursor moves (Disabled)
+  /*
   useEffect(() => {
     if (socket && activeCell) {
         socket.emit("cursor_move", { 
@@ -117,6 +125,7 @@ function CrosswordPlayer() {
         });
     }
   }, [activeCell, socket, id, user]);
+  */
 
   const { playClick, playSuccess, playError, playVictory } = useSound();
   const { theme, setTheme } = useTheme();
@@ -401,9 +410,11 @@ function CrosswordPlayer() {
       newAnswers[row][col] = char;
       setUserAnswers(newAnswers);
 
+      /*
       if (socket) {
           socket.emit("update_cell", { puzzleId: id, row, col, char });
       }
+      */
 
       // Move to next cell with Smart Skip (Skip filled cells)
       let nextRow = row;
@@ -650,6 +661,8 @@ function CrosswordPlayer() {
                     }`}>
                         {crossword.difficulty || 'Medium'}
                     </span>
+                    {/* Multiplayer Status (Hidden) */}
+                    {/* 
                     <span className={`text-xs px-2 py-1 rounded-full font-medium flex items-center gap-1 ${
                         isConnected 
                         ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300' 
@@ -658,6 +671,7 @@ function CrosswordPlayer() {
                         <span className={`w-2 h-2 rounded-full ${isConnected ? 'bg-emerald-500 animate-pulse' : 'bg-gray-400'}`}></span>
                         {isConnected ? 'Live' : 'Offline'}
                     </span>
+                    */}
                     <span className="text-xs text-gray-500 dark:text-gray-400">
                         by {crossword.author?.username || 'Unknown'}
                     </span>
