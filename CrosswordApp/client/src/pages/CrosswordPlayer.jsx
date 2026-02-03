@@ -14,6 +14,7 @@ import { useTheme } from "../hooks/useTheme";
 import { useAchievements } from "../hooks/useAchievements";
 import { useDragScroll } from "../hooks/useDragScroll";
 import { useAuth } from "../context/useAuth";
+import { io } from "socket.io-client";
 
 const ShareModal = lazy(() => import("../components/ShareModal"));
 
