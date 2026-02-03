@@ -1051,7 +1051,10 @@ function CrosswordPlayer() {
                           <FaTrophy /> Leaderboard
                       </button>
                       <button 
-                          onClick={() => window.location.reload()}
+                          onClick={() => {
+                              localStorage.removeItem(`crossword_progress_${id}`);
+                              window.location.reload();
+                          }}
                           className="px-6 py-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-semibold transition-colors"
                       >
                           Play Again
