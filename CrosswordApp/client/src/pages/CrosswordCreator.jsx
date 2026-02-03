@@ -81,7 +81,12 @@ function CrosswordCreator() {
       const { data } = await api.post("/crosswords/generate", { words: validWords });
       setGeneratedData(data.data);
       if (data.data.placedCount < validWords.length) {
-          setValidationWarning(`⚠️ Warning: Only ${data.data.placedCount} out of ${validWords.length} words could be placed in the grid. Some words were excluded to maintain valid connections.`);
+          const placedWordsSet = new Set(data.data.placedWords.map(w => w.word));
+          const excludedWords = validWords
+              .map(w => w.word.toUpperCase().trim())
+              .filter(w => !placedWordsSet.has(w));
+          
+          setValidationWarning(`⚠️ Warning: Only ${data.data.placedCount} out of ${validWords.length} words could be placed. Excluded: ${excludedWords.join(", ")} (No valid intersections found).`);
       }
     } catch (err) {
       setError(err?.response?.data?.message || "Failed to generate crossword. Try adding more intersecting words.");

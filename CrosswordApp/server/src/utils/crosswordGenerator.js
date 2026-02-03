@@ -95,49 +95,13 @@ class CrosswordGenerator {
     }
 
     // Fallback: Try to place disconnected words
-    // If words are still unplaced, try to place them without intersection
+    // REMOVED: We do not want to place disconnected words as it creates a bad user experience.
+    // Instead, we will return the partial grid and let the frontend warn the user.
+    /*
     if (unplaced.length > 0) {
-        // Sort unplaced by length (longest first) to optimize space
-        unplaced.sort((a, b) => b.word.length - a.word.length);
-
-        for (let i = 0; i < unplaced.length; i++) {
-            const currentWord = unplaced[i];
-            
-            // Find bounds of current placed words
-            let minRow = this.gridSize, maxRow = 0;
-            placedWords.forEach(w => {
-                minRow = Math.min(minRow, w.row);
-                maxRow = Math.max(maxRow, w.row + w.length); // approx
-            });
-            
-            // Try to place below the current grid with some padding
-            // We scan for the first valid empty spot
-            let placed = false;
-            
-            // Limit search space to avoid performance hit
-            for (let r = 0; r < this.gridSize; r++) {
-                if (placed) break;
-                for (let c = 0; c < this.gridSize; c++) {
-                    // Try Across
-                    if (this.canPlace(grid, currentWord.word, r, c, "across")) {
-                        this.placeWordOnGrid(grid, currentWord, r, c, "across", placedWords);
-                        unplaced.splice(i, 1);
-                        i--;
-                        placed = true;
-                        break;
-                    }
-                    // Try Down
-                    if (this.canPlace(grid, currentWord.word, r, c, "down")) {
-                        this.placeWordOnGrid(grid, currentWord, r, c, "down", placedWords);
-                        unplaced.splice(i, 1);
-                        i--;
-                        placed = true;
-                        break;
-                    }
-                }
-            }
-        }
+        // ... (removed)
     }
+    */
 
     // Calculate bounding box area for quality metric
     if (placedWords.length < 2) return null;

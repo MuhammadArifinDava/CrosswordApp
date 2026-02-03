@@ -9,6 +9,14 @@ function runTest(name, words) {
         if (result) {
             console.log(`Status: SUCCESS`);
             console.log(`Placed: ${result.placedCount}/${words.length}`);
+            
+            // Log unplaced words logic simulation
+            const placedSet = new Set(result.placedWords.map(w => w.word));
+            const unplaced = words.map(w => w.word.toUpperCase().replace(/[^A-Z]/g, "")).filter(w => !placedSet.has(w));
+            if (unplaced.length > 0) {
+                console.log(`Unplaced (Expected for impossible words): ${unplaced.join(", ")}`);
+            }
+
             // Basic validation
             if (result.placedCount === 0 && words.length > 0 && words[0].word.length > 0) {
                  console.log(`Warning: 0 words placed.`);
@@ -56,4 +64,15 @@ runTest("Standard Case", [
     { word: "NODE", clue: "Runtime" },
     { word: "EXPRESS", clue: "Framework" },
     { word: "MONGO", clue: "DB" }
+]);
+
+// 6. User Report Case (BUG should be unplaced)
+runTest("User Report Case", [
+    { word: "API", clue: "API" },
+    { word: "BUG", clue: "BUG" }, // Has B, U, G. No intersection with others.
+    { word: "LOOP", clue: "LOOP" },
+    { word: "CODE", clue: "CODE" },
+    { word: "ARRAY", clue: "ARRAY" },
+    { word: "SYNTAX", clue: "SYNTAX" },
+    { word: "PYTHON", clue: "PYTHON" }
 ]);
