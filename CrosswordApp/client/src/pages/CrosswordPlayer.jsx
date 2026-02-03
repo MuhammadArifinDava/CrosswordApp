@@ -14,7 +14,6 @@ import { useTheme } from "../hooks/useTheme";
 import { useAchievements } from "../hooks/useAchievements";
 import { useDragScroll } from "../hooks/useDragScroll";
 import { useAuth } from "../context/useAuth";
-import { io } from "socket.io-client";
 
 const ShareModal = lazy(() => import("../components/ShareModal"));
 
@@ -38,11 +37,13 @@ function CrosswordPlayer() {
 
   // ... existing state
 
-  // Initialize Socket
+  // Initialize Socket (DISABLED FOR NOW)
+  /*
   useEffect(() => {
     let newSocket;
-    const initSocket = () => {
+    const initSocket = async () => {
         try {
+            const { io } = await import("socket.io-client");
             // Determine socket URL based on environment
             const socketUrl = import.meta.env.VITE_API_URL || "http://localhost:5001";
             newSocket = io(socketUrl);
@@ -95,7 +96,7 @@ function CrosswordPlayer() {
                 }));
             });
         } catch (error) {
-            console.error("Failed to init socket", error);
+            console.error("Failed to load socket.io-client", error);
         }
     };
 
@@ -105,8 +106,10 @@ function CrosswordPlayer() {
         if (newSocket) newSocket.disconnect();
     };
   }, [id]);
+  */
 
-  // Broadcast cursor moves
+  // Broadcast cursor moves (DISABLED)
+  /*
   useEffect(() => {
     if (socket && activeCell) {
         socket.emit("cursor_move", { 
@@ -117,6 +120,7 @@ function CrosswordPlayer() {
         });
     }
   }, [activeCell, socket, id, user]);
+  */
 
   const { playClick, playSuccess, playError, playVictory } = useSound();
   const { theme, setTheme } = useTheme();
@@ -385,9 +389,9 @@ function CrosswordPlayer() {
       } else {
           newAnswers[row][col] = "";
           setUserAnswers(newAnswers);
-          if (socket) {
-              socket.emit("update_cell", { puzzleId: id, row, col, char: "" });
-          }
+          // if (socket) {
+          //     socket.emit("update_cell", { puzzleId: id, row, col, char: "" });
+          // }
       }
       return;
     }
@@ -401,9 +405,9 @@ function CrosswordPlayer() {
       newAnswers[row][col] = char;
       setUserAnswers(newAnswers);
 
-      if (socket) {
-          socket.emit("update_cell", { puzzleId: id, row, col, char });
-      }
+      // if (socket) {
+      //     socket.emit("update_cell", { puzzleId: id, row, col, char });
+      // }
 
       // Move to next cell with Smart Skip (Skip filled cells)
       let nextRow = row;
@@ -650,7 +654,7 @@ function CrosswordPlayer() {
                     }`}>
                         {crossword.difficulty || 'Medium'}
                     </span>
-                    {/* Multiplayer Status */}
+                    {/* Live/Offline Indicator Hidden
                     <span className={`text-xs px-2 py-1 rounded-full font-medium flex items-center gap-1 ${
                         isConnected 
                         ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300' 
@@ -659,6 +663,7 @@ function CrosswordPlayer() {
                         <span className={`w-2 h-2 rounded-full ${isConnected ? 'bg-emerald-500 animate-pulse' : 'bg-gray-400'}`}></span>
                         {isConnected ? 'Live' : 'Offline'}
                     </span>
+                    */}
                     <span className="text-xs text-gray-500 dark:text-gray-400">
                         by {crossword.author?.username || 'Unknown'}
                     </span>
@@ -784,7 +789,7 @@ function CrosswordPlayer() {
                             onCellClick={handleCellClick}
                             highlightedCells={highlightedCells}
                             showErrors={showErrors}
-                            remoteCursors={remoteCursors} // Pass remote cursors to grid
+                            remoteCursors={{}} // Pass empty object to hide remote cursors
                         />
                     </div>
                 </div>
